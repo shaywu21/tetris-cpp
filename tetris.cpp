@@ -18,8 +18,8 @@ int Rotate(int px, int py, int r) {
     switch (r % 4) {
         case 0: return py * 4 + px;             // 0 deg
         case 1: return 12 + py - (4 * px);      // 90 deg
-        case 2: return 15 - (4 * py);           // 180 deg
-        case 3: return 3 + py + (4 * px);       // 270 deg
+        case 2: return 15 - (4 * py) - px;           // 180 deg
+        case 3: return 3 - py + (4 * px);       // 270 deg
     }
     return 0;
 }
@@ -97,12 +97,13 @@ int main() {
     // Game logic
     bool bGameOver = false;
 
-    int nCurrentPiece = 0;
+    int nCurrentPiece = 1;
     int nCurrentRotation = 0;
     int nCurrentX = nFieldWidth/2;
     int nCurrentY = 0;
 
     bool bKey[4];
+    bool bRotateHold = false;
 
 
     while (!bGameOver) {
@@ -119,7 +120,12 @@ int main() {
         nCurrentX -= (bKey[1] && doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX - 1, nCurrentY)) ? 1 : 0;
         nCurrentY += (bKey[2] && doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY + 1)) ? 1 : 0;
 
-        nCurrentRotation += (bKey[3] && doesPieceFit(nCurrentPiece, nCurrentRotation + 1, nCurrentX, nCurrentY)) ? 1 : 0;
+        if (bKey[3]) {
+ 
+            nCurrentRotation += (!bRotateHold && doesPieceFit(nCurrentPiece, nCurrentRotation + 1, nCurrentX, nCurrentY)) ? 1 : 0;
+            bRotateHold = true;
+        }
+        else bRotateHold = false;
 
         // RENDER OUTPUT ===============================================
 
