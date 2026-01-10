@@ -5,7 +5,7 @@ Tetris coded in C++ displayed in terminal. Tutorial made by [Javidx9 (or OneLone
 # How To Play:
 You can control your Tetromino with the arrow keys and press Z to rotate.  
 # Usage:  
-1. Unzip the latest release
+1. Download and unzip the latest release
 2. Make sure you have the following .dll files in the root folder:  
 `libstdc++-6.dll`  
 `libgcc_s_seh-1.dll`  
