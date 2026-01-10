@@ -1,10 +1,10 @@
 # Overview
 Tetris coded in C++ displayed in terminal. Tutorial made by [Javidx9 (or OneLoneCoder)](https://www.youtube.com/@javidx9). Some code was referenced from [Jim (or HipToBeeSquare)](https://www.youtube.com/@HipToBeeSquare). The original code spawned new pieces in the same orientation. The rotations are randomised in my iteration.  
-# Tutorial:  
+# Tutorial  
 [Code-It-Yourself! Tetris - Programming from Scratch (Quick and Simple C++)](https://youtu.be/8OK8_tHeCIA?si=CjdU6mE0csHvKOTK) <<-- nothing quick or easy about this C++ tutorial, but I still appreciate it. Javidx9 is awesome.  
-# How To Play:
+# How To Play
 You can control your Tetromino with the arrow keys and press Z to rotate.  
-# Usage:  
+# Usage  
 1. Download and unzip the latest release
 2. Make sure you have the following .dll files in the root folder:  
 `libstdc++-6.dll`  
