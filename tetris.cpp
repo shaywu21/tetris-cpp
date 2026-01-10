@@ -1,6 +1,10 @@
+// followed tutorial; original code my Javidx9
+
 #include <iostream>
+#include <Windows.h>
+#include <thread>
+#include <vector>
 using namespace std;
-#include <windows.h>
 
 wstring tetromino[7];
 int nFieldWidth = 12;
@@ -66,11 +70,24 @@ int main() {
     for (int i = 0; i < nScreenWidth*nScreenHeight; i++) screen[i] = L' ';
     HANDLE hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
     SetConsoleActiveScreenBuffer(hConsole);
-    LPDWORD dwBytesWritten = 0;
+    DWORD dwBytesWritten = 0;
+
+    bool bGameOver = false;
+
+    while (!bGameOver) {
+
+        // Draw Field
+        for (int x = 0; x < nFieldWidth; x++)
+            for (int y = 0; y < nFieldHeight; y++)
+                screen[(y + 2)*nScreenWidth + (x + 2)] = L" ABCDEFG=#"[pField[y*nFieldWidth + x]];
+
+        // Display Frame    
+        WriteConsoleOutputCharacterW(hConsole, screen, nScreenWidth * nScreenHeight, { 0,0 }, &dwBytesWritten);
+
+    }
 
 
-    // Display Frame
-    WriteConsoleOutputCharacter(hConsole, screen, nScreenWidth * nScreenHeight, { 0,0 }, dwBytesWritten);
+
 
     return 0;
 
