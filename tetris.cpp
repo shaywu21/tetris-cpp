@@ -1,4 +1,4 @@
-// followed tutorial; original code my Javidx9
+// followed tutorial; original code by Javidx9
 
 #include <iostream>
 #include <Windows.h>
@@ -11,14 +11,14 @@ int nFieldWidth = 12;
 int nFieldHeight = 18;
 unsigned char *pField = nullptr;
 
-int nScreenWidth = 80; // Console Screen Size X (columns)
-int nScreenHeight = 30; // Console Screen Size Y (rows)
+int nScreenWidth = 80;   // Console Screen Size X (columns)
+int nScreenHeight = 30;  // Console Screen Size Y (rows)
 
 int Rotate(int px, int py, int r) {
     switch (r % 4) {
         case 0: return py * 4 + px;             // 0 deg
         case 1: return 12 + py - (4 * px);      // 90 deg
-        case 2: return 15 - (4 * py) - px;           // 180 deg
+        case 2: return 15 - (4 * py) - px;      // 180 deg
         case 3: return 3 - py + (4 * px);       // 270 deg
     }
     return 0;
@@ -26,7 +26,7 @@ int Rotate(int px, int py, int r) {
 
 bool doesPieceFit(int nTetromino, int nRotation, int nPosX, int nPosY) {
     for (int px = 0; px < 4; px++)
-        for (int py = 0; py < 4; py++){
+        for (int py = 0; py < 4; py++) {
 
             // Get index into piece
             int pi = Rotate(px, py, nRotation);
@@ -44,7 +44,6 @@ bool doesPieceFit(int nTetromino, int nRotation, int nPosX, int nPosY) {
 
     return true;
 }
-
 
 int main() {
     //creating assets
@@ -96,26 +95,24 @@ int main() {
 
     // Game logic
     bool bGameOver = false;
+    bool bKey[4];
+    bool bRotateHold = false;
+    bool bForceDown = false;
 
     int nCurrentPiece = 1;
     int nCurrentRotation = 0;
     int nCurrentX = nFieldWidth/2;
     int nCurrentY = 0;
 
-    bool bKey[4];
-    bool bRotateHold = false;
-
     int nSpeed = 20;
     int nSpeedCounter = 0;
-    bool bForceDown = false;
-    int nPieceCount = 0;
     int nScore = 0;
+    int nPieceCount = 0;
 
     vector<int> vLines;
 
 
     while (!bGameOver) {
-
         // GAME TIMING =================================================
         this_thread::sleep_for(50ms); // Game TICK
         nSpeedCounter++;
@@ -132,13 +129,11 @@ int main() {
         nCurrentY += (bKey[2] && doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY + 1)) ? 1 : 0;
 
         if (bKey[3]) {
- 
             nCurrentRotation += (!bRotateHold && doesPieceFit(nCurrentPiece, nCurrentRotation + 1, nCurrentX, nCurrentY)) ? 1 : 0;
             bRotateHold = true;
         }
         else bRotateHold = false;
-
-        //
+        // Make piece fall faster
         if(bForceDown){
             if (doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY + 1))
                 nCurrentY++;
@@ -154,7 +149,7 @@ int main() {
 
                 // Check have we got any horizontal lines
                 for (int py = 0; py < 4; py++)
-                    if (nCurrentY + py < nFieldHeight - 1){
+                    if (nCurrentY + py < nFieldHeight - 1) {
                         bool bLine = true;
                         for (int px = 1; px < nFieldWidth - 1; px++)
                             bLine &= (pField[(nCurrentY + py) * nFieldWidth + px]) != 0;
@@ -165,10 +160,8 @@ int main() {
                                 pField[(nCurrentY + py) * nFieldWidth + px] = 8;
 
                             vLines.push_back(nCurrentY + py);
-
                         }
                     }
-
                 // Add points
                 nScore += 25;
                 // Exponential points for clearing more lines at a time
@@ -183,12 +176,9 @@ int main() {
                 // if piece does not fit
                 bGameOver = !doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY);
             }
-
             nSpeedCounter = 0;
         }
-
         // RENDER OUTPUT ===============================================
-
         // Draw Field
         for (int x = 0; x < nFieldWidth; x++)
             for (int y = 0; y < nFieldHeight; y++)
@@ -203,11 +193,11 @@ int main() {
         // Draw Score
         swprintf_s(&screen[2 * nScreenWidth + nFieldWidth + 6], 16, L"SCORE: %8d", nScore);
 
-        if (!vLines.empty()){
+        if (!vLines.empty()) {
             // Display Frame (to draw lines)
             WriteConsoleOutputCharacterW(hConsole, screen, nScreenWidth * nScreenHeight, { 0,0 }, &dwBytesWritten);
             this_thread::sleep_for(350ms); // Delay after scoring points
-
+            // Clear lines formed
             for (auto &v : vLines)
                 for (int px = 1; px < nFieldWidth - 1; px++) {
                     for (int py = v; py > 0; py--)
@@ -216,10 +206,8 @@ int main() {
                 }
             vLines.clear();
         }
-
         // Display Frame    
         WriteConsoleOutputCharacterW(hConsole, screen, nScreenWidth * nScreenHeight, { 0,0 }, &dwBytesWritten);
-
     }
 
     // rip
