@@ -105,17 +105,28 @@ int main() {
     bool bKey[4];
     bool bRotateHold = false;
 
+    int nSpeed = 20;
+    int nSpeedCounter = 0;
+    bool bForceDown = false;
+    int nPieceCount = 0;
+    int nScore = 0;
+
+    vector<int> vLines;
+
 
     while (!bGameOver) {
 
         // GAME TIMING =================================================
-        this_thread::sleep_for(50ms);
+        this_thread::sleep_for(50ms); // Game TICK
+        nSpeedCounter++;
+        bForceDown = (nSpeedCounter == nSpeed);
 
         // INPUT =======================================================
         for (int k = 0; k < 4; k++)                              // R   L   D Z
             bKey[k] = (0x8000 & GetAsyncKeyState((unsigned char)("\x27\x25\x28Z"[k]))) != 0;
 
         // GAME LOGIC ==================================================
+        // Player Movement
         nCurrentX += (bKey[0] && doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX + 1, nCurrentY)) ? 1 : 0;
         nCurrentX -= (bKey[1] && doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX - 1, nCurrentY)) ? 1 : 0;
         nCurrentY += (bKey[2] && doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY + 1)) ? 1 : 0;
@@ -126,6 +137,55 @@ int main() {
             bRotateHold = true;
         }
         else bRotateHold = false;
+
+        //
+        if(bForceDown){
+            if (doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY + 1))
+                nCurrentY++;
+            else{
+                // Lock the current peice in the field
+                for (int px = 0; px < 4; px++)
+                    for (int py = 0; py < 4; py++)
+                        if (tetromino[nCurrentPiece][Rotate(px, py, nCurrentRotation)] == L'X')
+                            pField[(nCurrentY + py) * nFieldWidth + (nCurrentX + px)] = nCurrentPiece + 1;
+                nPieceCount++;
+                if (nPieceCount % 10 == 0)
+                    if (nSpeed >= 10) nSpeed--;
+
+                // Check have we got any horizontal lines
+                for (int py = 0; py < 4; py++)
+                    if (nCurrentY + py < nFieldHeight - 1){
+                        bool bLine = true;
+                        for (int px = 1; px < nFieldWidth - 1; px++)
+                            bLine &= (pField[(nCurrentY + py) * nFieldWidth + px]) != 0;
+
+                        if (bLine){
+                            // Remove line, set to =
+                            for (int px = 1; px < nFieldWidth - 1; px++)
+                                pField[(nCurrentY + py) * nFieldWidth + px] = 8;
+
+                            vLines.push_back(nCurrentY + py);
+
+                        }
+                    }
+
+                // Add points
+                nScore += 25;
+                // Exponential points for clearing more lines at a time
+                if (!vLines.empty()) nScore += (1 << vLines.size()) * 100;
+
+                // Choose next piece
+                nCurrentX = nFieldWidth / 2;
+                nCurrentY = 0;
+                nCurrentRotation = rand() % 4;
+                nCurrentPiece = rand() % 7;
+
+                // if piece does not fit
+                bGameOver = !doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY);
+            }
+
+            nSpeedCounter = 0;
+        }
 
         // RENDER OUTPUT ===============================================
 
@@ -139,15 +199,33 @@ int main() {
             for (int py = 0; py < 4; py++)
                 if (tetromino[nCurrentPiece][Rotate(px, py, nCurrentRotation)] == L'X')
                     screen[(nCurrentY + py + 2)*nScreenWidth + (nCurrentX + px + 2)] = nCurrentPiece + 65;
+        
+        // Draw Score
+        swprintf_s(&screen[2 * nScreenWidth + nFieldWidth + 6], 16, L"SCORE: %8d", nScore);
+
+        if (!vLines.empty()){
+            // Display Frame (to draw lines)
+            WriteConsoleOutputCharacterW(hConsole, screen, nScreenWidth * nScreenHeight, { 0,0 }, &dwBytesWritten);
+            this_thread::sleep_for(350ms); // Delay after scoring points
+
+            for (auto &v : vLines)
+                for (int px = 1; px < nFieldWidth - 1; px++) {
+                    for (int py = v; py > 0; py--)
+                        pField[py * nFieldWidth + px] = pField[(py - 1) * nFieldWidth + px];
+                    pField[px] = 0;
+                }
+            vLines.clear();
+        }
 
         // Display Frame    
         WriteConsoleOutputCharacterW(hConsole, screen, nScreenWidth * nScreenHeight, { 0,0 }, &dwBytesWritten);
 
     }
 
-
-
+    // rip
+    CloseHandle(hConsole);
+    cout << "Game Over! Score:" << nScore << endl;
+    system("pause");
 
     return 0;
-
 }
