@@ -115,23 +115,11 @@ int main() {
             bKey[k] = (0x8000 & GetAsyncKeyState((unsigned char)("\x27\x25\x28Z"[k]))) != 0;
 
         // GAME LOGIC ==================================================
-        if (bKey[1]){
-            if (doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX - 1, nCurrentY)){
-                nCurrentX = nCurrentX - 1;
-            }
-        }
+        nCurrentX += (bKey[0] && doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX + 1, nCurrentY)) ? 1 : 0;
+        nCurrentX -= (bKey[1] && doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX - 1, nCurrentY)) ? 1 : 0;
+        nCurrentY += (bKey[2] && doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY + 1)) ? 1 : 0;
 
-        if (bKey[0]){
-            if (doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX + 1, nCurrentY)){
-                nCurrentX = nCurrentX + 1;
-            }
-        }
-
-        if (bKey[2]){
-            if (doesPieceFit(nCurrentPiece, nCurrentRotation, nCurrentX, nCurrentY + 1 )){
-                nCurrentY = nCurrentY + 1;
-            }
-        }
+        nCurrentRotation += (bKey[3] && doesPieceFit(nCurrentPiece, nCurrentRotation + 1, nCurrentX, nCurrentY)) ? 1 : 0;
 
         // RENDER OUTPUT ===============================================
 
