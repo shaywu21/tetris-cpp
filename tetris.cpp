@@ -24,6 +24,28 @@ int Rotate(int px, int py, int r) {
     return 0;
 }
 
+bool doesPieceFit(int nTetromino, int nRotation, int nPosX, int nPosY) {
+    for (int px = 0; px < 4; px++)
+        for (int py = 0; py < 4; py++){
+
+            // Get index into piece
+            int pi = Rotate(px, py, nRotation);
+
+            // Get index into field
+            int fi = (nPosY + py) * nFieldWidth + (nPosX + px);
+
+            if (nPosX + px >= 0 && nPosX + px < nFieldWidth){
+                if (nPosY + py >= 0 && nPosY + py < nFieldHeight){
+                    if (tetromino[nTetromino][pi] == L'X' && pField[fi] != 0)
+                        return false; //fail on first hit
+                }
+            }
+        }
+
+    return true;
+}
+
+
 int main() {
     //creating assets
     tetromino[0].append(L"..X.");
@@ -72,14 +94,35 @@ int main() {
     SetConsoleActiveScreenBuffer(hConsole);
     DWORD dwBytesWritten = 0;
 
+    // Game logic
     bool bGameOver = false;
 
+    int nCurrentPiece = 0;
+    int nCurrentRotation = 0;
+    int nCurrentX = nFieldWidth/2;
+    int nCurrentY = 0;
+
+
     while (!bGameOver) {
+
+        // GAME TIMING =================================================
+
+        // INPUT =======================================================
+
+        // GAME LOGIC ==================================================
+
+        // RENDER OUTPUT ===============================================
 
         // Draw Field
         for (int x = 0; x < nFieldWidth; x++)
             for (int y = 0; y < nFieldHeight; y++)
                 screen[(y + 2)*nScreenWidth + (x + 2)] = L" ABCDEFG=#"[pField[y*nFieldWidth + x]];
+
+        // Draw Current Piece
+        for (int px = 0; px < 4; px++)
+            for (int py = 0; py < 4; py++)
+                if (tetromino[nCurrentPiece][Rotate(px, py, nCurrentRotation)] == L'X')
+                    screen[(nCurrentY + py + 2)*nScreenWidth + (nCurrentX + px + 2)] = nCurrentPiece + 65;
 
         // Display Frame    
         WriteConsoleOutputCharacterW(hConsole, screen, nScreenWidth * nScreenHeight, { 0,0 }, &dwBytesWritten);
