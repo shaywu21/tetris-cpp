@@ -5,16 +5,15 @@ Tetris coded in C++ displayed in terminal. Tutorial made by [Javidx9 (or OneLone
 # How To Play:
 You can control your Tetromino with the arrow keys and press Z to rotate.  
 # Usage:  
-### Without IDE  
-1. Clone this project
-2. Have the following .dll files:  
+1. Unzip the latest release
+2. Make sure you have the following .dll files in the root folder:  
 `libstdc++-6.dll`  
 `libgcc_s_seh-1.dll`  
 `libwinpthread-1.dll`
 3. Run tetris.exe
-### With IDE
+# Compilation Instructions
 1. Clone this project
-2. Have any C++ extention and compiler installed
+2. Have any C++ extension and compiler installed
 3. Run tetris.cpp in IDE
 # Known Issues  
 I don't know why, but the window size needs to be shrunk (only horizontally) until the play field and blocks look right. I'll try to fix this the next time I touch on this.
